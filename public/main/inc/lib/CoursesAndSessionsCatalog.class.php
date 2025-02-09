@@ -457,21 +457,25 @@ class CoursesAndSessionsCatalog
             $categoryFilter = ' AND category_code = "'.$categoryCode.'" ';
         }
 
-        //$sql = "SELECT DISTINCT course.*, $injectExtraFields
+        //$sql = "SELECT DISTINCT course.*, $injectExtraFields        
         $sql = "SELECT DISTINCT(course.id)
                 FROM $courseTable course
-                $sqlInjectJoins
+                INNER JOIN " .Database::get_course_table(TABLE_COURSE_DESCRIPTION). "
+                as dp on course.id = dp.c_id
                 WHERE (
                         course.code LIKE '%".$keyword."%' OR
                         course.title LIKE '%".$keyword."%' OR
-                        course.tutor_name LIKE '%".$keyword."%'
+                        course.tutor_name LIKE '%".$keyword."%' OR
+                        dp.content LIKE '%".$keyword."%'
                     )
                     $where
                     $categoryFilter
                     $sqlInjectWhere
+                    $courseLanguageWhere
                     $avoidCoursesCondition
+                    $showCoursesCondition
                     $visibilityCondition
-                ORDER BY title, visual_code ASC
+                ORDER BY course.title, course.visual_code ASC
                 $limitFilter
                 ";
 
